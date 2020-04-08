@@ -69,6 +69,28 @@ def welcome():
         )
 
 
+@app.route("/404")
+@app.route("/404.html")
+def not_found():
+    with open(STATIC_DIR + '/404.html', 'r') as fp:
+        template = Template(fp.read())
+
+        return template.substitute(
+            resource=""
+        )
+
+
+@app.route("/401")
+@app.route("/401.html")
+def not_authorized():
+    with open(STATIC_DIR + '/401.html', 'r') as fp:
+        template = Template(fp.read())
+
+        return template.substitute(
+            resource=""
+        )
+
+
 @app.route("/rel/<path:path>")
 def render_relative_path(path):
     """ Find the path on the referring host's server """

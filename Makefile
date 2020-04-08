@@ -12,13 +12,17 @@ export FLASK_RUN_PORT
 export GITHUB_CLIENT_ID
 export GITHUB_SECRET
 export PROJECT
+export FLASK_ENV=deveopment
 export PYTHONPATH=.:$(VENV):$(VENV_BUILD)
+export IS_DEBUG=true
+export ENV=develop
 
 server: compile
 	@test -n "$(HOST)" # set $$HOST variable
 	$(PYTHON) -m server
 
 compile: $(VENV)
+$(VENV): requirements.txt requirements/app.txt
 	$(PYTHON) -m pip install -t $(VENV) -r requirements.txt
 
 compileAll: compile $(VENV_BUILD)
