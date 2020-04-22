@@ -15,6 +15,7 @@ from .utils import headers, RegexConverter, response
 from point.server.base import get_me
 from flask_simpleldap import LDAP
 from point.clients.gitcontent import GitContent
+from point.renderer import render
 
 LOG = logging.getLogger(__name__)
 
@@ -90,15 +91,16 @@ def render_github_url(path):
     org, project, branch, *tail = path.split('/')
     path = '/'.join(tail)
     path = path[:len(path)-4]
+    token = None
 
     repo = GitHubRepo.first_repo(org, project)
-    owner = None
     if repo and repo.has_owner:
         owner = GitHubUser.first(repo.owner)
-        # TODO and is authorized
-        body = GitContent(owner.git_token).get(org, project, path)
+        # if owner: # TODO and is authorized
+        token = owner.git_token
 
-    return render_url(path, headers=headers(user=owner))
+    body = GitContent(token).get(org, project, path)
+    return render(body)
 
 
 @app.route("/<path:path>")
@@ -118,6 +120,7 @@ def render_url(path, headers=None, **kwargs):
 
     except IOError as err:
         return str(err), 400
+
 
 def run():
     app.run(host='0.0.0.0', port=5001, debug=IS_DEV)

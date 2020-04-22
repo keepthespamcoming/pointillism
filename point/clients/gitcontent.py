@@ -10,10 +10,14 @@ class GitContent:
         self.token = token
 
     def headers(self):
-        return {
-            'Authorization': f'token {self.token}',
+        heads = {
             'Accept': 'application/vnd.github.v3.raw'
         }
+
+        if self.token is not None:
+            heads['Authorization'] = f'token {self.token}'
+
+        return heads
 
     def get(self, owner, repo, path):
         uri = '/'.join((API_BASE, 'repos', owner, repo, 'contents', path))
