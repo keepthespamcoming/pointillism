@@ -14,6 +14,7 @@ from ldapauth.flask.routes import auth_routes, register_config
 from .utils import headers, RegexConverter, response
 from point.server.base import get_me
 from flask_simpleldap import LDAP
+from point.clients.gitcontent import GitContent
 
 LOG = logging.getLogger(__name__)
 
@@ -86,13 +87,16 @@ def welcome():
 @app.route("/github/<path:path>")
 def render_github_url(path):
     # BUG: don't want to require owner to load first. or do you?
-    org, project, *_tail = path.split('/')
+    org, project, branch, *tail = path.split('/')
+    path = '/'.join(tail)
+    path = path[:len(path)-4]
 
     repo = GitHubRepo.first_repo(org, project)
     owner = None
-
     if repo and repo.has_owner:
         owner = GitHubUser.first(repo.owner)
+        # TODO and is authorized
+        body = GitContent(owner.git_token).get(org, project, path)
 
     return render_url(path, headers=headers(user=owner))
 
@@ -114,7 +118,6 @@ def render_url(path, headers=None, **kwargs):
 
     except IOError as err:
         return str(err), 400
-
 
 def run():
     app.run(host='0.0.0.0', port=5001, debug=IS_DEV)

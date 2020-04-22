@@ -19,7 +19,9 @@ class RegexConverter(BaseConverter):
 
 
 def headers(user=None, **config):
-    heads = {}
+    heads = {
+
+    }
 
     if user and user.git_token:
         heads['Authorization'] = f'token {user.git_token}'

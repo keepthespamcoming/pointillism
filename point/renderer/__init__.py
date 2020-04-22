@@ -1,7 +1,7 @@
 import logging
 import requests
 from graphviz import Source
-from point.theme import theme_inject, THEME
+from point.theme import theme_inject
 
 logging.basicConfig(filename='pointillism.log', level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
@@ -22,6 +22,8 @@ def url(host, path, **params):
 
 # look up this dict method
 def render(host, path, format="png", theme=None, headers={}, **params):
+    org, repo, *tail = path
+    path = "/".join((org, repo, 'contents', *tail))
     dot_url = url(host, path, **params)
     LOG.debug(f"GET: {dot_url}")
     LOG.debug(f'headers: {headers}')
